@@ -1,30 +1,23 @@
-//
-
 #import <Foundation/Foundation.h>
-#include <CoreFoundation/CoreFoundation.h>
-#include <CoreServices/CoreServices.h>
-#include <QuickLook/QuickLook.h>
+
+#import <CoreFoundation/CoreFoundation.h>
+#import <CoreServices/CoreServices.h>
+#import <QuickLook/QuickLook.h>
 
 #import "QLSMagicFileAttributes.h"
 
 
 // Generate a preview for the document with the given url
-OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
+OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef request,
                                CFURLRef url, CFStringRef contentTypeUTI,
                                CFDictionaryRef options) {
-  if (QLPreviewRequestIsCancelled(preview))
-    return noErr;
-  
   @autoreleasepool {
-    NSMutableDictionary *props = [NSMutableDictionary new];
-    props[(NSString *)kQLPreviewPropertyMIMETypeKey]  = @"text/plain";
-    props[(NSString *)kQLPreviewPropertyWidthKey]     = @700;
-    props[(NSString *)kQLPreviewPropertyHeightKey]    = @80;
-
+    if (QLPreviewRequestIsCancelled(request))
+      return noErr;
     
-    QLSMagicFileAttributes *magicAttributes =
-        [QLSMagicFileAttributes magicAttributesForItemAtURL:(__bridge NSURL *)url];
-        
+    QLSMagicFileAttributes *magicAttributes
+        = [QLSMagicFileAttributes magicAttributesForItemAtURL:(__bridge NSURL *)url];
+    
     if (!magicAttributes) {
       NSLog(@"QLStephen: Could not determine attribtues of file %@", url);
       return noErr;
@@ -40,23 +33,15 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
       return noErr;
     }
     
-    props[(NSString *)kQLPreviewPropertyStringEncodingKey] = @( magicAttributes.fileEncoding );
+    NSDictionary *previewProperties = @{
+      (NSString *)kQLPreviewPropertyMIMETypeKey   : @"text/plain",
+      (NSString *)kQLPreviewPropertyStringEncodingKey : @( magicAttributes.fileEncoding ),
+      (NSString *)kQLPreviewPropertyWidthKey      : @700,
+      (NSString *)kQLPreviewPropertyHeightKey     : @800
+    };
     
-    NSError *error;
-    NSData *fileData = [NSData dataWithContentsOfURL:(__bridge NSURL *)url
-                                             options:NSDataReadingMappedIfSafe
-                                               error:&error];
-    if (!fileData) {
-      NSLog(@"QLStephen: Could not read file %@; error was %@", url, error);
-      return noErr;
-    }
-    
-        
-    QLPreviewRequestSetDataRepresentation(
-        preview,
-        (__bridge CFDataRef)fileData,
-        kUTTypePlainText,
-        (__bridge CFDictionaryRef)props);
+    QLPreviewRequestSetURLRepresentation(request, url, kUTTypePlainText,
+                                         (__bridge CFDictionaryRef)previewProperties);
 
     return noErr;
   }

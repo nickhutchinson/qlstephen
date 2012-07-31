@@ -15,10 +15,11 @@
 
 @end
 
+
 @implementation QLSMagicFileAttributes
 
-+ (instancetype)magicAttributesForItemAtURL:(NSURL *)aURL {
-  
++ (instancetype)magicAttributesForItemAtURL:(NSURL *)aURL
+{
   NSString *magicString = [self magicStringForFileAtURL:aURL];
   if (!magicString) return nil;
   
@@ -52,21 +53,23 @@
 }
 
 
-+ (NSRegularExpression *)magicOutputRegex {
++ (NSRegularExpression *)magicOutputRegex
+{
   NSString *regexString =
-  @"\\S+: (\\S+/\\S+); charset=(\\S+)";
+      @"\\S+: (\\S+/\\S+); charset=(\\S+)";
   
   NSError *error;
   NSRegularExpression *regex =
-  [NSRegularExpression regularExpressionWithPattern:regexString
-                                            options:0
-                                              error:&error];
-  NSParameterAssert(regex);
+      [NSRegularExpression regularExpressionWithPattern:regexString
+                                                options:0
+                                                  error:&error];
+  NSAssert(regex, @"Invalid regex");
   
   return regex;
 }
 
-+ (NSString *)magicStringForFileAtURL:(NSURL *)aURL {
++ (NSString *)magicStringForFileAtURL:(NSURL *)aURL
+{
   NSString *path = [aURL path];
   NSParameterAssert(path);
   
@@ -87,18 +90,19 @@
   [NSCharacterSet whitespaceAndNewlineCharacterSet];
   
   NSData *output =
-  [[task.standardOutput fileHandleForReading] readDataToEndOfFile];
+      [[task.standardOutput fileHandleForReading] readDataToEndOfFile];
   
   NSString *stringOutput =
-  [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding];
+      [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding];
   
   stringOutput =
-  [stringOutput stringByTrimmingCharactersInSet:whitespaceCharset];
+      [stringOutput stringByTrimmingCharactersInSet:whitespaceCharset];
   
   return stringOutput;
 }
 
-+ (BOOL)mimeTypeIsTextual:(NSString *)mimeType {
++ (BOOL)mimeTypeIsTextual:(NSString *)mimeType
+{
   NSArray *components = [mimeType componentsSeparatedByString:@"/"];
   if (components.count != 2)
     return NO;
@@ -107,9 +111,10 @@
     return YES;
   
   NSString *UTType =
-  CFBridgingRelease(UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType,
-                                                          (__bridge CFStringRef)mimeType,
-                                                          kUTTypeData));
+      CFBridgingRelease(UTTypeCreatePreferredIdentifierForTag(
+                            kUTTagClassMIMEType,
+                            (__bridge CFStringRef)mimeType,
+                            kUTTypeData));
   
   if (UTTypeConformsTo((__bridge CFStringRef)UTType, kUTTypeText)) {
     return YES;
