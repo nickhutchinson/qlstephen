@@ -14,13 +14,15 @@ static NSString *uppercaseString(NSString *aString, NSLocale *locale) {
 }
 
 /**
+ * @brief If the file has no extension--eg. Makefile, Doxyfile, CHANGELOG etc--
+ *   we badge it with the filename itself. This might not be the best of
+ *   heuristics, but it seems to work well enough.
+ *
  * @return the text used to badge the thumbnail.
+ * @todo Filenames or extensions are sometimes too long to properly fit the 
+ *       Finder icon, and the result looks ridiculous. FIXME.
  */
 static NSString *ThumbnailBadgeForItemAtURL(NSURL *url) {
-  // If the file has no extension--eg. Makefile, Doxyfile, CHANGELOG etc--we
-  // badge it with the filename itself. This might not be the best of
-  // heuristics, but it seems to work well enough.
-  
   NSString *fileExtension = [url pathExtension];
   NSString *badge;
 
