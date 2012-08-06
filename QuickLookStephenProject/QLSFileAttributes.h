@@ -6,11 +6,13 @@
 
 #import <Foundation/Foundation.h>
 
-@interface QLSMagicFileAttributes : NSObject
+@interface QLSFileAttributes : NSObject
 
-+ (instancetype)magicAttributesForItemAtURL:(NSURL *)aURL;
++ (instancetype)attributesForItemAtURL:(NSURL *)aURL;
 
-@property (readonly) BOOL isTextual;
+@property (readonly) NSURL *url;
+
+@property (readonly) BOOL isTextFile;
 @property (readonly) NSString *mimeType;
 @property (readonly) CFStringEncoding fileEncoding;
 

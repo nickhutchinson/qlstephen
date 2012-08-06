@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0107ABFE15C76F2900C65F1A /* QLSMagicFileAttributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0107ABFC15C76F2900C65F1A /* QLSMagicFileAttributes.h */; };
-		0107ABFF15C76F2900C65F1A /* QLSMagicFileAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 0107ABFD15C76F2900C65F1A /* QLSMagicFileAttributes.m */; };
+		0107ABFE15C76F2900C65F1A /* QLSFileAttributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0107ABFC15C76F2900C65F1A /* QLSFileAttributes.h */; };
+		0107ABFF15C76F2900C65F1A /* QLSFileAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 0107ABFD15C76F2900C65F1A /* QLSFileAttributes.m */; };
 		2C05A19C06CAA52B00D84F6F /* GeneratePreviewForURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C05A19B06CAA52B00D84F6F /* GeneratePreviewForURL.m */; };
 		61E3BCFB0870B4F2002186A0 /* GenerateThumbnailForURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 61E3BCFA0870B4F2002186A0 /* GenerateThumbnailForURL.m */; };
 		8D576312048677EA00EA77CD /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 08FB77B6FE84183AC02AAC07 /* main.c */; settings = {ATTRIBUTES = (); }; };
@@ -35,8 +35,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0107ABFC15C76F2900C65F1A /* QLSMagicFileAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QLSMagicFileAttributes.h; sourceTree = "<group>"; };
-		0107ABFD15C76F2900C65F1A /* QLSMagicFileAttributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QLSMagicFileAttributes.m; sourceTree = "<group>"; };
+		0107ABFC15C76F2900C65F1A /* QLSFileAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QLSFileAttributes.h; sourceTree = "<group>"; };
+		0107ABFD15C76F2900C65F1A /* QLSFileAttributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QLSFileAttributes.m; sourceTree = "<group>"; };
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		08FB77B6FE84183AC02AAC07 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
@@ -104,8 +104,8 @@
 				61E3BCFA0870B4F2002186A0 /* GenerateThumbnailForURL.m */,
 				2C05A19B06CAA52B00D84F6F /* GeneratePreviewForURL.m */,
 				08FB77B6FE84183AC02AAC07 /* main.c */,
-				0107ABFC15C76F2900C65F1A /* QLSMagicFileAttributes.h */,
-				0107ABFD15C76F2900C65F1A /* QLSMagicFileAttributes.m */,
+				0107ABFC15C76F2900C65F1A /* QLSFileAttributes.h */,
+				0107ABFD15C76F2900C65F1A /* QLSFileAttributes.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -125,7 +125,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0107ABFE15C76F2900C65F1A /* QLSMagicFileAttributes.h in Headers */,
+				0107ABFE15C76F2900C65F1A /* QLSFileAttributes.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,7 +206,7 @@
 				8D576312048677EA00EA77CD /* main.c in Sources */,
 				2C05A19C06CAA52B00D84F6F /* GeneratePreviewForURL.m in Sources */,
 				61E3BCFB0870B4F2002186A0 /* GenerateThumbnailForURL.m in Sources */,
-				0107ABFF15C76F2900C65F1A /* QLSMagicFileAttributes.m in Sources */,
+				0107ABFF15C76F2900C65F1A /* QLSFileAttributes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

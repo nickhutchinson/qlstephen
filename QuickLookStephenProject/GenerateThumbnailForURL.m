@@ -4,13 +4,27 @@
 #import <CoreServices/CoreServices.h>
 #import <QuickLook/QuickLook.h>
 
-#import "QLSMagicFileAttributes.h"
+#import "QLSFileAttributes.h"
 
 
 static NSString *uppercaseString(NSString *aString, NSLocale *locale) {
   NSMutableString *copy = [aString mutableCopy];
   CFStringUppercase((__bridge CFMutableStringRef)(copy), (CFLocaleRef)locale);
   return copy;
+}
+
+
+static NSDictionary *MIMETypeToBadgeMap() {
+  return @{
+      @"application/xml": @"xml",
+      @"text/x-c"       : @"C",
+      @"text/x-c++"     : @"C++",
+      @"text/x-shellscript" : @"shell",
+      @"text/x-php"     : @"php",
+      @"text/x-python"  : @"python",
+      @"text/x-perl"    : @"perl",
+      @"text/x-ruby"    : @"ruby"
+  };
 }
 
 /**
@@ -22,14 +36,47 @@ static NSString *uppercaseString(NSString *aString, NSLocale *locale) {
  * @todo Filenames or extensions are sometimes too long to properly fit the 
  *       Finder icon, and the result looks ridiculous. FIXME.
  */
-static NSString *ThumbnailBadgeForItemAtURL(NSURL *url) {
+static NSString *ThumbnailBadgeForPlainTextItemAtURL(NSURL *url,
+                                                     NSString *mimeType) {
   NSString *fileExtension = [url pathExtension];
   NSString *badge;
 
-  if ([fileExtension isEqualToString:@""])
-    badge = [url lastPathComponent];
-  else
+  // Do we have a file extension?
+  if (![fileExtension isEqualToString:@""]) {
     badge = fileExtension;
+    
+    // Is the file extension too long to be reasonably displayed in a thumbnail?
+    // Is so, fall back on the additional tests.
+    
+    // FIXME1: use some better best to determine an appropriate length.
+    // FIXME2: perhaps truncate the extension (at the end? in the middle?) to
+    //         fit as much in the thumbnail as possible.
+    
+    if ([badge length] >= 10)
+      badge = nil;
+  }
+
+  // Do we have a well-known MIME type? Note that we only do this test if we
+  // have no file extension. It's would be pretty jarring to get a misdiagnosis.
+  if (!badge && [fileExtension isEqualToString:@""]) {
+    NSDictionary *map = MIMETypeToBadgeMap();
+    badge = map[mimeType];
+  }
+  
+  // Do we have an executable text file? If so, assume it's a script of some
+  // sort.
+  if (!badge) {
+    NSFileManager *fm = [NSFileManager new];
+    BOOL isExecutable = [fm isExecutableFileAtPath:[url path]];
+    if (isExecutable)
+      badge = @"script";
+  }
+    
+  if (!badge) {
+    badge = @"txt"; // I would use "text", but the OS X text QuickLook
+                    // generator uses "txt", and we ought to be consistent.
+  }
+  
 
   return uppercaseString(badge, [NSLocale currentLocale]);
 }
@@ -49,15 +96,15 @@ OSStatus GenerateThumbnailForURL(void *thisInterface,
     if (QLThumbnailRequestIsCancelled(request))
       return noErr;
         
-    QLSMagicFileAttributes *magicAttributes
-        = [QLSMagicFileAttributes magicAttributesForItemAtURL:(__bridge NSURL *)url];
+    QLSFileAttributes *magicAttributes
+        = [QLSFileAttributes attributesForItemAtURL:(__bridge NSURL *)url];
     
     if (!magicAttributes) {
       NSLog(@"QLStephen: Could not determine attribtues of file %@", url);
       return noErr;
     }
     
-    if (!magicAttributes.isTextual) {
+    if (!magicAttributes.isTextFile) {
 //      NSLog(@"QLStephen: I don't think %@ is a text file", url);
       return noErr;
     }
@@ -68,12 +115,12 @@ OSStatus GenerateThumbnailForURL(void *thisInterface,
     }
     
     NSDictionary *previewProperties = @{
-      (NSString *)kQLPreviewPropertyMIMETypeKey       : @"text/plain",
       (NSString *)kQLPreviewPropertyStringEncodingKey : @( magicAttributes.fileEncoding )
     };
     
-    
-    NSString *badge = ThumbnailBadgeForItemAtURL((__bridge NSURL *)url);
+    NSString *badge = ThumbnailBadgeForPlainTextItemAtURL(
+                          (__bridge NSURL *)url,
+                          magicAttributes.mimeType);
 
     NSDictionary *properties = @{
       (NSString *)kQLThumbnailPropertyExtensionKey : badge

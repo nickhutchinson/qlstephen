@@ -4,7 +4,7 @@
 #import <CoreServices/CoreServices.h>
 #import <QuickLook/QuickLook.h>
 
-#import "QLSMagicFileAttributes.h"
+#import "QLSFileAttributes.h"
 
 
 // Generate a preview for the document with the given url
@@ -15,15 +15,15 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef request,
     if (QLPreviewRequestIsCancelled(request))
       return noErr;
     
-    QLSMagicFileAttributes *magicAttributes
-        = [QLSMagicFileAttributes magicAttributesForItemAtURL:(__bridge NSURL *)url];
+    QLSFileAttributes *magicAttributes
+        = [QLSFileAttributes attributesForItemAtURL:(__bridge NSURL *)url];
     
     if (!magicAttributes) {
       NSLog(@"QLStephen: Could not determine attribtues of file %@", url);
       return noErr;
     }
     
-    if (!magicAttributes.isTextual) {
+    if (!magicAttributes.isTextFile) {
 //      NSLog(@"QLStephen: I don't think %@ is a text file", url);
       return noErr;
     }
@@ -34,7 +34,6 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef request,
     }
     
     NSDictionary *previewProperties = @{
-      (NSString *)kQLPreviewPropertyMIMETypeKey   : @"text/plain",
       (NSString *)kQLPreviewPropertyStringEncodingKey : @( magicAttributes.fileEncoding ),
       (NSString *)kQLPreviewPropertyWidthKey      : @700,
       (NSString *)kQLPreviewPropertyHeightKey     : @800

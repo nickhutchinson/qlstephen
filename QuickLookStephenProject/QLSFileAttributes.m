@@ -5,19 +5,20 @@
 //  Created by Nick Hutchinson on 31/07/12.
 //
 
-#import "QLSMagicFileAttributes.h"
+#import "QLSFileAttributes.h"
 
-@interface QLSMagicFileAttributes ()
+@interface QLSFileAttributes ()
 
-@property (readwrite) BOOL isTextual;
+@property (readwrite) BOOL isTextFile;
 @property (readwrite) NSString *mimeType;
 @property (readwrite) CFStringEncoding fileEncoding;
+@property (readwrite) NSURL *url;
 
 @end
 
-@implementation QLSMagicFileAttributes
+@implementation QLSFileAttributes
 
-+ (instancetype)magicAttributesForItemAtURL:(NSURL *)aURL
++ (instancetype)attributesForItemAtURL:(NSURL *)aURL
 {
   NSString *magicString = [self magicStringForItemAtURL:aURL];
   if (!magicString) return nil;
@@ -43,19 +44,20 @@
   CFStringEncoding encoding = CFStringConvertIANACharSetNameToEncoding(
                                   (CFStringRef)charset);
   
-  QLSMagicFileAttributes *props = [QLSMagicFileAttributes new];
-  props.fileEncoding = encoding;
-  props.isTextual = mimeTypeIsTextual;
-  props.mimeType = mimetype;
+  QLSFileAttributes *attributes = [QLSFileAttributes new];
+  attributes.fileEncoding = encoding;
+  attributes.isTextFile = mimeTypeIsTextual;
+  attributes.mimeType = mimetype;
+  attributes.url = aURL;
   
-  return props;
+  return attributes;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Private Methods
 ////////////////////////////////////////////////////////////////////////////////
 
-
+// FIXME: NSRegularExpression is not available on 10.6.
 + (NSRegularExpression *)magicOutputRegex
 {
   NSString *regexString =
