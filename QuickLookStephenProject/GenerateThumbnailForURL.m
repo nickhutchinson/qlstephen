@@ -3,6 +3,7 @@
 #include <QuickLook/QuickLook.h>
 
 #import <Foundation/Foundation.h>
+#import "RegexKitLite.h"
 
 #import "QLSFileAttributes.h"
 
@@ -11,7 +12,7 @@
  * This dictionary is used for a file with no extension. It maps the MIME type
  * (as returned by file(1)) onto an appropriate thumbnail badge.
  */
-static NSDictionary *MIMETypeToBadgeMap() {
+static NSDictionary *mimeTypeToBadgeMap() {
   return @{
     @"application/xml": @"xml",
     @"text/x-c"       : @"C",
@@ -25,14 +26,26 @@ static NSDictionary *MIMETypeToBadgeMap() {
 }
 
 /**
+ * Some formats, e.g. Makefiles, have well-known names and no extension.
+ */
+static NSDictionary *filenameRegexToBadgeMap() {
+  return @{
+    @"Makefile" : @"make"
+  };
+}
+
+/**
  * @return the string that should be used to badge the thumbnail.
  */
 static NSString *ThumbnailBadgeForItemWithAttributes(
     QLSFileAttributes *attributes) {
+  
   NSString *fileExtension = attributes.url.pathExtension;
-  NSString *badge;
+  NSString *fileName = attributes.url.lastPathComponent;
+  __block NSString *badge;
 
-  // Do we have a file extension?
+  // Do we have a file extension? If so, use it as a badge if it's not too
+  // long.
   if (![fileExtension isEqualToString:@""]) {
     badge = fileExtension;
 
@@ -52,8 +65,21 @@ static NSString *ThumbnailBadgeForItemWithAttributes(
   // would be annoying if the file extension were to say one thing and the
   // badge another.
   if (!badge && [fileExtension isEqualToString:@""]) {
-    NSDictionary *map = MIMETypeToBadgeMap();
+    NSDictionary *map = mimeTypeToBadgeMap();
     badge = map[attributes.mimeType];
+  }
+  
+  // Does the filename match a known pattern? If so, use the appropriate badge.
+  if (!badge && [fileExtension isEqualToString:@""]) {
+    NSDictionary *map = filenameRegexToBadgeMap();
+
+    [map enumerateKeysAndObjectsUsingBlock:
+      ^(NSString *regex, NSString *candidateBadge, BOOL *stop) {
+        if ([fileName rkl_isMatchedByRegex:regex]) {
+          badge = candidateBadge;
+          *stop = true;
+        }
+    }];
   }
 
   // Do we have an executable text file? If so, assume it's a script of some
@@ -65,9 +91,11 @@ static NSString *ThumbnailBadgeForItemWithAttributes(
       badge = @"script";
   }
 
+  // No other tests passed? Just badge it with "txt". I would use "text",
+  // except that the OS X text QuickLook generator uses "txt", and we ought
+  // to be consistent with it.
   if (!badge) {
-    badge = @"txt"; // I would use "text", but the OS X text QuickLook
-                    // generator uses "txt", and we ought to be consistent.
+    badge = @"txt";
   }
 
   return [badge uppercaseString];
@@ -132,5 +160,5 @@ OSStatus GenerateThumbnailForURL(void *thisInterface,
 
 void CancelThumbnailGeneration(void* thisInterface,
                                QLThumbnailRequestRef thumbnail) {
-    // implement only if supported
+  // implement only if supported
 }
