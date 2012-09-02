@@ -7,13 +7,6 @@
 #import "QLSFileAttributes.h"
 
 
-static NSString *uppercaseString(NSString *aString, NSLocale *locale) {
-  NSMutableString *copy = [aString mutableCopy];
-  CFStringUppercase((__bridge CFMutableStringRef)(copy), (CFLocaleRef)locale);
-  return copy;
-}
-
-
 /**
  * This dictionary is used for a file with no extension. It maps the MIME type
  * (as returned by file(1)) onto an appropriate thumbnail badge.
@@ -77,8 +70,7 @@ static NSString *ThumbnailBadgeForItemWithAttributes(
                     // generator uses "txt", and we ought to be consistent.
   }
 
-
-  return uppercaseString(badge, [NSLocale currentLocale]);
+  return [badge uppercaseString];
 }
 
 
